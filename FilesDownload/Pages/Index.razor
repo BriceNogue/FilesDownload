@@ -1,0 +1,86 @@
+﻿@page "/"
+
+@using Models;
+@using Contracts;
+@using Microsoft.AspNetCore.Components.Forms;
+
+@inject IFileService _fileService;
+
+@code {
+
+    FileModel fileModel = new();
+
+    List<FileModel> files = new();
+
+    private IBrowserFile selectedFile;
+    private double? uploadPercentage;
+
+    private async Task UploadFile()
+    {
+        if (selectedFile != null)
+        {
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                await selectedFile.OpenReadStream().CopyToAsync(memoryStream);
+
+                byte[] fileContent = memoryStream.ToArray();
+                int totalBytes = fileContent.Length;
+                int bytesUploaded = 0;
+
+                // Simulé une progression.
+                while (bytesUploaded < totalBytes)
+                {                    
+                    bytesUploaded += 1024;
+
+                    uploadPercentage = (double)bytesUploaded / totalBytes;
+                    StateHasChanged();
+
+                    await Task.Delay(100);
+                }
+
+                await _fileService.UploadFile(selectedFile.Name, fileContent);
+            }
+        }
+    }
+
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+    }
+
+}
+
+<section class="containers">
+    <div class="container section-1">
+        <h1>File Download App</h1>
+    </div>
+
+    <div class="container section-2">
+        <form >
+            <div>
+                <label>Upload file</label>
+            </div>
+            <div>
+                @if (uploadPercentage.HasValue)
+                {
+                    <p>Progress: @uploadPercentage.Value.ToString("P0")</p>
+                }
+            </div>
+            <div>
+                <InputFile OnChange="@OnInputFileChange" />
+            </div>
+            <div>
+                <button @onclick="UploadFile">Upload</button>
+            </div>
+        </form>
+    </div>
+
+    <p>Files list</p>
+
+    @{
+        foreach (var file in files)
+        {
+            <p> @file.FileName </p>
+        }
+    }
+</section>

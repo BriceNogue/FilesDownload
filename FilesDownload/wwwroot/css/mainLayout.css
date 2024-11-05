@@ -1,0 +1,29 @@
+﻿
+header {
+    max-width: 100%;
+}
+
+.nav-bar {
+    height: 60px;
+    display: flex;
+    padding: 0 1.5rem;
+    justify-content: space-between;
+    align-items: center;
+    background: #1f2937;
+    box-shadow: 1px 1px 5px Gray;
+}
+
+.logo, .curent-user {
+    color: white;
+}
+
+.nav-links {
+    display: inline-flex;
+    gap: 1.5rem;
+}
+
+.nav-link {
+    color: white;
+    text-decoration: none;
+    text-transform: uppercase;
+}
